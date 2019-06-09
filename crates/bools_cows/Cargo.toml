@@ -1,0 +1,15 @@
+[package]
+name = "bools_cows"
+version = "0.1.0"
+authors = ["andrey"]
+edition = "2018"
+
+[lib]
+name = "bools"
+crate-type = ["rlib", "dylib"]
+
+[dependencies]
+rand = "0.4.0"
+erlang_nif-sys = ">=0.6.4"
+lazy_static = "1.3.*"
+rustler = ">=0.20.0"
