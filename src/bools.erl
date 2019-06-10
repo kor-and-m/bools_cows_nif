@@ -12,7 +12,7 @@
 -define(PRIV, "./priv").
 
 -define(APPNAME, bools_cows_nif).
--define(LIBNAME, "libbools").
+-define(LIBNAME, "libbools.so").
 
 guess_sync(_Ref) ->
     not_loaded(?LINE).
