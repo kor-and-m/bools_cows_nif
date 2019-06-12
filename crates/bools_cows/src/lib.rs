@@ -4,12 +4,17 @@ use rustler::{Env, Term, NifResult, Encoder, Decoder};
 
 mod step;
 
-pub fn test_game(a: &Vec<u8>) -> Vec<step::Step> {
-    let real = step::guess::Guess::new(a[0], a[1], a[2], a[3]);
-    if real.is_guess() {
-        step::guess_game(&real)
-    } else {
-        vec![]
+pub fn test_game(a: &Vec<u8>) -> Result<Vec<step::Step>, &'static str> {
+    if a.len() == 4 {
+      let real = step::guess::Guess::new(a[0], a[1], a[2], a[3]);
+      if real.is_guess() {
+        Ok(step::guess_game(&real))
+      } else {
+        Err("numerals_repeat")
+      }
+    }
+    else {
+      Err("wrong_length")
     }
 }
 
@@ -19,7 +24,7 @@ pub fn random_guess() -> Vec<u8> {
 
 mod atoms {
     rustler_atoms! {
-        atom step;
+        atom ok;
         atom error;
     }
 }
@@ -58,8 +63,11 @@ fn guess_async<'a>(env: Env<'a>, args: &[Term<'a>]) -> NifResult<Term<'a>> {
 
 fn guess_real<'a>(env: Env<'a>, args: &[Term<'a>]) -> NifResult<Term<'a>> {
     let guess: Vec<u8> = args[0].decode()?;
-    let steps: Vec<(Vec<u8>, (u8, u8))> = test_game(&guess).into_iter().map(|x| {
-        (x.guess.to_vec(), x.result.to_tuple())
-    }).collect();
-    Ok(steps.encode(env))
+    match test_game(&guess) {
+      Ok(v) => 
+        Ok((atoms::ok(), v.into_iter().map(|x| {
+          (x.guess.to_vec(), x.result.to_tuple())
+        }).collect::<Vec<_>>()).encode(env)),
+      Err(e) => Ok((atoms::error(), e).encode(env)),
+    }
 }

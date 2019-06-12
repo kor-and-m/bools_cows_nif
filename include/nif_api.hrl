@@ -1,0 +1,2 @@
+-type(api_error_types() :: numerals_repeat | wrong_length).
+-type(api_error() :: {error, api_error_types()}).

@@ -6,6 +6,7 @@
 ]).
 
 -include("game.hrl").
+-include("nif_api.hrl").
 
 -spec next_guess(history(), sync | {async, integer()}) -> guess().
 next_guess(History, sync) ->
@@ -19,9 +20,13 @@ next_guess(History, {async, C1}) ->
   end, History),
   bools:guess_async(SerializedHistory, C1).
 
+-spec guess_num([integer()]) -> {ok, history()} | api_error_types().
 guess_num(G) ->
-  lists:map(
-    fun ({Guess, {B, C}}) ->
-      #step{result = #result{bools = B, cows = C}, guess = Guess}
-    end, bools:guess(G)
-  ).
+  case bools:guess(G) of
+    {ok, Result} ->
+      {ok, lists:map(fun ({Guess, {B, C}}) ->
+        #step{result = #result{bools = B, cows = C}, guess = Guess}
+      end, Result)};
+    {error, Reason} ->
+      {error, binary_to_atom(Reason, latin1)}
+  end.

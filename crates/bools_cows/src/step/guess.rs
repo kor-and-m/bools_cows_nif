@@ -31,7 +31,7 @@ impl Guess {
 }
 
 #[test]
-fn struct_test_vec() {
+fn to_vec_guess_test() {
 	let g = Guess::new(1, 6, 7, 3);
 	assert_eq!(g.to_vec(), vec![1, 6, 7, 3]);
 }
